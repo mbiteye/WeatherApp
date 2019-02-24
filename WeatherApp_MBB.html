@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+    <!-- Make the webpage responsive to fit different types of devices-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--The following style tag contains all the css code used-->
+<style>
+    /* The following is the css code used to set the background of the webpage,
+        which is an image in the source folder
+    */
+body{
+background-image: url("https://media.giphy.com/media/PLJzdMVafDLTW/giphy.gif"); 
+	background-color: white;
+	background-repeat: no-repeat;
+	background-size: 100% 200%; 
+}
+/* The following css code edits the position of the first div element which contains the temperature 
+    and windspeed to be displayed when the user enters a city and state
+    */
+div:first-child{
+	padding-top: 30px;
+	padding-left: 30px;
+	padding-right: 30px;
+	margin-bottom: 10px;
+}
+
+/*Css code to edit the position of the weather image and 
+    place it on the top center of the page
+*/
+img{
+height:175px;
+position: center;
+max-width: 50%;
+	padding-left: 400px;
+	padding-bottom: 10px;
+}
+
+/* The following css makes the page mobile responsive*/
+@media screen and (max-width: 700px){
+    /*Make the body elements adapt to a mobile screen*/
+    body{
+    position: relative;
+background-image: url("https://media.giphy.com/media/PLJzdMVafDLTW/giphy.gif"); 
+	background-repeat: no-repeat;
+    background-size: 100% 200%;
+    background-position: center;
+    font-size:large;
+}
+ /*Make the send button adapt to a mobile screen*/
+#snd{
+    position: relative;
+    margin-left:75px;
+    padding-left: 0px;
+    width: 100px;
+    height:25px;
+}
+ /*Make the header image adapt to a mobile screen*/
+img{
+    position: relative;
+padding-left: 50px;
+margin-right: 10px;
+max-width: 75%;
+    height: auto;}
+}
+</style>
+    
+</head>
+
+<body >
+    <!-- Insert an image fromsource folder to the top center of the screen -->
+<img src="http://think-magazine.com/wp-content/uploads/2016/10/weather-icon-1280x640.jpg" alt="logo" height="100" width="444">
+
+<div >
+    <!-- Create textboxes where the user can enter a state and city-->
+ <strong>City: </strong> <input autocomplete="off" id="cty" type="text"/>
+ <div id="state">
+<br/><strong>State: </strong> <input autocomplete="off" id="sta" type="text"/>
+</div>
+  <br/><br/>
+    <!-- Button used to subtmit the values entered by the user
+        and call the temp() function which receives the city and state -->
+  <button id="snd" value="City" onclick="temp()">Send</button> 
+  
+    <!--Div contains two <p> elements as placeholder for weather information-->
+  <div id="weather"></div>
+    
+    <p><strong>City, State: <span id="loc"> </span></strong></p>
+        <p><strong>Temperature: <span id="tmp"> </span></strong></p>
+        <p><Strong>Wind Wind Speed: <span id="wnd">  </span></Strong></p>
+  
+</div>
+    <form>
+        <input type="button" onclick="geoFindMe()" value="Get Location" />
+        <div id="out"></div>
+    </form>
+
+    <!--The following script tag contains all the javascript code used-->
+ <script>
+     
+     /* Function creates a new http request with the api stored in url,
+        uses get request to obtain temperature, wind speed and location from api.
+     */
+function temp(){
+var weather = new XMLHttpRequest();
+var url = "http://api.wunderground.com/api/4ff99c281a1f4c27/conditions/q/" + document.getElementById('sta').value + "/" + document.getElementById('cty').value + ".json";
+weather.open("GET", url, false);
+weather.send(null);
+    //parse te response into json format
+var r = JSON.parse(weather.response);
+console.log(r);
+    /* Display the location, temperature and windspeed in the <p> tag
+       using the document.getElementById 
+    */
+var loc =  r.current_observation.display_location.full + "<br />";
+var tmp = r.current_observation.temperature_string + "<br />";
+var wnd = r.current_observation.wind_string + "<br />";
+document.getElementById("loc").innerHTML = loc;
+document.getElementById("tmp").innerHTML = tmp;
+document.getElementById("wnd").innerHTML = wnd;
+}
+
+     /* This function is used to display the geomap for users current location
+     */
+
+function geoFindMe() {
+    var output = document.getElementById("out");
+
+    if (!navigator.geolocation) {
+        output.innerHTML = "<p>Your brower doesn't support geoLocation</p>";
+        return;
+    }
+    /*Store the users location in longitude and latitude variables if successfull,
+      Display the geomap using the users coordinates
+    */
+    function success(position) {
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+
+        output.innerHTML = 'Latitude is ' + latitude + 'Â° <br>Longitude is ' + longitude + 'Â°<br/>';
+
+        var img = new Image();
+        img.src = "http://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=13&size=300x300&sensor=false";
+
+        output.appendChild(img);
+    };
+
+    /*Display an error message if unable to obtain the user's current location*/
+    function error() {
+        output.innerHTML = "Cannot retrive your location...";
+    };
+
+    output.innerHTML = "<p>Locatingâ€¦</p>";
+
+    navigator.geolocation.getCurrentPosition(success, output.innerHTML = "Cannot retrive your location...");
+}
+</script> 
+  
+</body>
+
+</html>
